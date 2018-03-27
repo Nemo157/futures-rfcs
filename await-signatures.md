@@ -69,9 +69,11 @@ s/-> Result<(.+), (.+)>/-> impl Future<Item = \1, Error = \1>/
 ```
 
 <aside>
+
 Warning, highly cribbed from the [C# async programming
 docs](https://msdn.microsoft.com/en-us/library/hh191443(v=vs.110).aspx), not
 suitable for direct inclusion in Rust docs.
+
 </aside>
 
 The `#[async]` and `await!` macros are the heart of asynchronous programming in
