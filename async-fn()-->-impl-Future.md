@@ -122,6 +122,14 @@ is what prompted the original design of the macro.
 >
 > -- [@withoutboats comment](https://github.com/alexcrichton/futures-await/issues/15#issuecomment-366489968)
 
+I argue this is not a true downside. This is just the current state of `impl
+Trait`, if this is a major issue for `#[async]` then it will be a major issue
+for other users of `impl Trait` and should be fixed at the source.
+
+It also seems to be closer to the current thinking around lifetimes in
+signatures, along with the plan to support explicit elided lifetimes this is
+ensuring that reading the function signature will allow you to quickly determine
+the lifetime dependencies.
 
 # Rationale and alternatives
 [alternatives]: #alternatives
