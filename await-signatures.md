@@ -35,14 +35,14 @@ as well:
 pub trait CountDown {
   type Future<'a>: Future<Item = (), Error = !> + 'a;
 
-  fn start(&mut self, count: Duration) -> Self::Future;
+  fn start(&mut self, count: Duration) -> Self::Future<'_>;
 }
 
 impl CountDown for Timer {
   abstract type Future<'a> = impl Future<Item = (), Error = !> + 'a;
 
   #[async]
-  fn start(&mut self, count: Duration) -> Self::Future {
+  fn start(&mut self, count: Duration) -> Self::Future<'_> {
     ...
   }
 }
