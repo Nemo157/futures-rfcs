@@ -32,17 +32,24 @@ as well:
 ## Forward compatibility with nominal existential types
 
 ```rust
-pub trait CountDown {
-  type Future<'a>: Future<Item = (), Error = !> + 'a;
+pub abstract type CountDown: Future<Item = (), Error = !>;
 
-  fn start(&mut self, count: Duration) -> Self::Future<'_>;
+#[async]
+pub fn count_down(count: Duration) -> CountDown {
+    ...
+}
+```
+
+## Forward compatibility with `impl Trait` in trait
+
+```rust
+pub trait CountDown {
+  fn start(&mut self, count: Duration) -> impl Future<Item = (), Error = !> + '_;
 }
 
 impl CountDown for Timer {
-  abstract type Future<'a> = impl Future<Item = (), Error = !> + 'a;
-
   #[async]
-  fn start(&mut self, count: Duration) -> Self::Future<'_> {
+  fn start(&mut self, count: Duration) -> impl Future<Item = (), Error = !> + '_ {
     ...
   }
 }
