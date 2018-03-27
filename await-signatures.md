@@ -38,10 +38,6 @@ pub abstract type CountDown: Future<Item = (), Error = !>;
 pub fn count_down(count: Duration) -> CountDown {
     ...
 }
-
-pub fn cancel(count_down: CountDown) {
-    ...
-}
 ```
 
 ## Forward compatibility with `impl Trait` in trait
