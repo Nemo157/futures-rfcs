@@ -62,15 +62,69 @@ of signature. See [Prior Art][prior-art] below for examples.
 # Guide-level explanation
 [guide-level-explanation]: #guide-level-explanation
 
-Explain the proposal as if it was already included in the language and you were teaching it to another Rust programmer. That generally means:
+Update all examples:
 
-- Introducing new named concepts.
-- Explaining the feature largely in terms of examples.
-- Explaining how Rust programmers should *think* about the feature, and how it should impact the way they use Rust. It should explain the impact as concretely as possible.
-- If applicable, provide sample error messages, deprecation warnings, or migration guidance.
-- If applicable, describe the differences between teaching this to existing Rust programmers and new Rust programmers.
+```sed
+s/-> Result<(.+), (.+)>/-> impl Future<Item = \1, Error = \1>/
+```
 
-For implementation-oriented RFCs (e.g. for compiler internals), this section should focus on how compiler contributors should think about the change, and give examples of its concrete impact. For policy RFCs, this section should provide an example-driven introduction to the policy, and explain its impact in concrete terms.
+<aside>
+
+Warning, highly cribbed from the [C# async programming
+docs](https://msdn.microsoft.com/en-us/library/hh191443(v=vs.110).aspx), not
+suitable for direct inclusion in Rust docs.
+
+</aside>
+
+The `#[async]` and `await!` macros are the heart of asynchronous programming in
+Rust.  By using these two keywords you can easily and succinctly create
+asynchronous methods without the overhead of define creating structs and writing
+manual `Future` implementations.
+
+The following example shows an asynchronous method. Almost everything in the
+code should look completely familiar to you. The comments call out the features
+that you add to create the asynchrony.
+
+```rust
+// Two things to note in this signature:
+//  - The function has the `#[async]` macro applied to it.
+//  - The return type is `impl Future`
+#[async]
+fn fetch_rust_lang(client: hyper::Client) -> impl Future<Item=String, Error=io::Error> {
+    // hyper::Client::get returns a `Future<Item=Response>`. That means that
+    // when you await the future you'll get a `Response`
+    let responseTask = client.get("https://www.rust-lang.org");
+
+    // You can do work here that doesn't rely on the response.
+    do_something_else();
+
+    // The `await!` macro suspends `fetch_rust_lang`
+    //  - `fetch_rust_lang` can't continue until `responseTask` is complete
+    //  - Meanwhile, the parent future that called `fetch_rust_lang` can perform
+    //    other work of its own
+    //  - Control will resume here once `responseTask` is complete
+    //  - The `await!` macro then returns a `Result<Response, io::Error>`
+    //    containing the result or error returned from `responseTask` (this is
+    //    handled via the `?` operator here).
+    let response = await!(responseTask)?;
+
+    // If something goes wrong, you can return a `Result::Err` value to
+    // shortcircuit this Future.
+    if !response.status().is_success() {
+        return Err(io::Error::new(io::ErrorKind::Other, "request failed"))
+    }
+
+    // `response.body().concat()` returns another `Future<Item=Vec<u8>>` which
+    // will resolve with the complete body of the response once it's downloaded.
+    let body = await!(response.body().concat())?;
+    let string = String::from_utf8(body)?;
+
+    // The return value must be a `Result` of the same `Item` and `Error` types
+    // as the signature declares. Any methods that are awaiting
+    // `fetch_rust_lang` will be able to resume with the returned value.
+    Ok(string)
+}
+```
 
 # Reference-level explanation
 [reference-level-explanation]: #reference-level-explanation
