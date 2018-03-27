@@ -56,34 +56,8 @@ possible to automatically infer this from the return type as well.
 
 ## More consistency with other languages
 
-[C#](https://msdn.microsoft.com/en-us/library/hh191443(v=vs.110).aspx):
-```C#
-async Task<int> AccessTheWebAsync()
-{
-    HttpClient client = new HttpClient();
-    string urlContents = await client.GetStringAsync("http://msdn.microsoft.com");
-    return urlContents.Length;
-}
-```
-
-[TypeScript](http://www.typescriptlang.org/play/index.html#src=function%20delay(ms)%20%7B%0D%0A%20%20%20%20return%20new%20Promise(function%20(resolve)%20%7B%0D%0A%20%20%20%20%20%20%20%20setTimeout(resolve%2C%20ms)%3B%0D%0A%20%20%20%20%7D)%3B%0D%0A%7D%0D%0Aasync%20function%20foo()%3A%20Promise%3Cnumber%3E%20%7B%0D%0A%20%20%20%20await%20delay(100)%3B%0D%0A%20%20%20%20return%205%3B%0D%0A%7D):
-```TypeScript
-async function foo(): Promise<number> {
-    await delay(100);
-    return 5;
-}
-```
-
-[Dart](https://www.dartlang.org/articles/language/await-async):
-> If the expression being returned has type `T`, the function should have return type `Future<T>` (or a supertype thereof). Otherwise, a static warning is issued.
-
-[Hack](https://docs.hhvm.com/hack/async/introduction):
-```hack
-async function curl_A(): Awaitable<string> {
-  $x = await \HH\Asio\curl_exec("http://example.com/");
-  return $x;
-}
-```
+All existing statically typed `async`/`await` supporting languages use this form
+of signature. See [Prior Art][prior-art] below for examples.
 
 # Guide-level explanation
 [guide-level-explanation]: #guide-level-explanation
@@ -111,6 +85,14 @@ The section should return to the examples given in the previous section, and exp
 
 # Drawbacks
 [drawbacks]: #drawbacks
+
+## The generators return type is not written down
+
+While this changes the written return type, it doesn't affect what the user is
+allowed to return from the generator. This is still forced to be a `Result` of
+some kind (although, this could likely be extended to `Try`). This inconsistency
+between the functions declared return type and the function body's actual return
+is what prompted the original design of the macro.
 
 ## `impl Trait` requires specifying all lifetimes
 
@@ -151,19 +133,36 @@ The section should return to the examples given in the previous section, and exp
 # Prior art
 [prior-art]: #prior-art
 
-Discuss prior art, both the good and the bad, in relation to this proposal.
-A few examples of what this can include are:
+## More consistency with other languages
 
-- For language, library, cargo, tools, and compiler proposals: Does this feature exist in other programming languages and what experience have their community had?
-- For community proposals: Is this done by some other community and what were their experiences with it?
-- For other teams: What lessons can we learn from what other communities have done here?
-- Papers: Are there any published papers or great posts that discuss this? If you have some relevant papers to refer to, this can serve as a more detailed theoretical background.
+[C#](https://msdn.microsoft.com/en-us/library/hh191443(v=vs.110).aspx):
+```C#
+async Task<int> AccessTheWebAsync()
+{
+    HttpClient client = new HttpClient();
+    string urlContents = await client.GetStringAsync("http://msdn.microsoft.com");
+    return urlContents.Length;
+}
+```
 
-This section is intended to encourage you as an author to think about the lessons from other languages, provide readers of your RFC with a fuller picture.
-If there is no prior art, that is fine - your ideas are interesting to us whether they are brand new or if it is an adaptation from other languages.
+[TypeScript](http://www.typescriptlang.org/play/index.html#src=function%20delay(ms)%20%7B%0D%0A%20%20%20%20return%20new%20Promise(function%20(resolve)%20%7B%0D%0A%20%20%20%20%20%20%20%20setTimeout(resolve%2C%20ms)%3B%0D%0A%20%20%20%20%7D)%3B%0D%0A%7D%0D%0Aasync%20function%20foo()%3A%20Promise%3Cnumber%3E%20%7B%0D%0A%20%20%20%20await%20delay(100)%3B%0D%0A%20%20%20%20return%205%3B%0D%0A%7D):
+```TypeScript
+async function foo(): Promise<number> {
+    await delay(100);
+    return 5;
+}
+```
 
-Note that while precedent set by other languages is some motivation, it does not on its own motivate an RFC.
-Please also take into consideration that rust sometimes intentionally diverges from common language features.
+[Dart](https://www.dartlang.org/articles/language/await-async):
+> If the expression being returned has type `T`, the function should have return type `Future<T>` (or a supertype thereof). Otherwise, a static warning is issued.
+
+[Hack](https://docs.hhvm.com/hack/async/introduction):
+```hack
+async function curl_A(): Awaitable<string> {
+  $x = await \HH\Asio\curl_exec("http://example.com/");
+  return $x;
+}
+```
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
