@@ -96,7 +96,8 @@ that you add to create the asynchrony.
 // Two things to note in this signature:
 //  - The function has the `#[async]` macro applied to it.
 //  - The return type is `impl Future`
-#[async]
+// See below for the description of the `unpinned` argument.
+#[async(unpinned)]
 fn fetch_rust_lang(client: hyper::Client) -> impl Future<Item=String, Error=io::Error> {
     // hyper::Client::get returns a `Future<Item=Response>`. That means that
     // when you await the future you'll get a `Response`
@@ -132,6 +133,11 @@ fn fetch_rust_lang(client: hyper::Client) -> impl Future<Item=String, Error=io::
     Ok(string)
 }
 ```
+
+The `#[async]` macro defaults to creating potentially self-referential `impl
+StableFuture`, to instead create movable non-self-referential `impl Future` you
+must pass the `unpinned` argument. Similarly if you wish to create a boxed
+future you can use `#[async(boxed)] fn foo() -> Box<Future>`.
 
 # Reference-level explanation
 [reference-level-explanation]: #reference-level-explanation
@@ -236,6 +242,17 @@ async function curl_A(): Awaitable<string> {
 # Unresolved questions
 [unresolved]: #unresolved-questions
 
-- What parts of the design do you expect to resolve through the RFC process before this gets merged?
-- What parts of the design do you expect to resolve through the implementation of this feature before stabilization?
-- What related issues do you consider out of scope for this RFC that could be addressed in the future independently of the solution that comes out of this RFC?
+ * Is it possible to automatically detect `Box` return types?
+   * This would allow removing the `boxed` argument to the `#[async]` macro.
+   * Extending from this, could this then allow any `CoerceUnsized` smart
+     pointer to be used?
+
+ * Could generators be changed to not require a different syntax to support
+   self-references?
+   * For example if they just automatically don't implement `Unpin` if they have
+     a self-reference then this could allow removing the `unpinned` argument to
+     the `#[async]` macro and just rely on whether `Unpin` is implemented.
+
+ * If it's not possible to remove the `unpinned` argument, should `unpinned` be
+   the default, and what should the exact argument be (`pinned`, `move`,
+   `unpin`, `stable`, ...)?
