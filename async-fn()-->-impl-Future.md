@@ -153,13 +153,21 @@ future you can use `#[async(boxed)] fn foo() -> Box<Future>`.
 # Reference-level explanation
 [reference-level-explanation]: #reference-level-explanation
 
-This is the technical portion of the RFC. Explain the design in sufficient detail that:
+[WIP working implementation][].
 
-- Its interaction with other features is clear.
-- It is reasonably clear how the feature would be implemented.
-- Corner cases are dissected by example.
+`#[async]` will not touch the provided signature in any way. Most of the
+generated code will be similar to what it is today. The `futures-async-runtime`
+will only contain 2 different wrapper types, one to support
+`StableFuture`/`StableStream` and one to support `Future`/`Stream`. The wrappers
+will implement `Future` or `Stream` (or the `Stable` variants of) based on the
+yield and return type of the generated closure.
 
-The section should return to the examples given in the previous section, and explain more fully how the detailed proposal makes those examples work.
+If it's possible to detect a `Box` return type automatically then this will be
+done and any `Box<...>` return type will be boxed. Otherwise, the user will
+still have to pass a `boxed` argument as today when they specify `Box<...>` as a
+return type.
+
+[WIP working implementation]: https://github.com/rust-lang-nursery/futures-rs/compare/master...Nemo157:alternate-signatures
 
 # Drawbacks
 [drawbacks]: #drawbacks
