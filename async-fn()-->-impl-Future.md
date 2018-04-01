@@ -6,11 +6,21 @@ Transition `#[async]` functions
 <dl><dt>from</dt> <dd>
 
 being written with a `Result` return type that gets rewritten inside the macro
-to `impl Future`
+to `impl Future`, e.g.
+
+```rust
+#[async]
+fn fetch_rust_lang(client: hyper::Client) -> io::Result<String>
+```
 
 </dd><dt>to</dt><dd>
 
-being written with an `impl Future` or similar return type directly
+being written with an `impl Future` or similar return type directly, e.g.
+
+```rust
+#[async]
+fn fetch_rust_lang(client: hyper::Client) -> impl Future<Item=String, Error=io::Error>
+```
 
 </dd></dl>
 
