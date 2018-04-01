@@ -1,10 +1,21 @@
 # Summary
 [summary]: #summary
 
-Transition `#[async]` functions from: being written with a `Result` return type
-that gets rewritten inside the macro to `impl Future`; to: being written with an
-`impl Future` return type directly. Also support `impl Stream`, `Box<Future>`,
-`impl StableFuture` etc. (potentially also any `CoerceUnsized` if possible?).
+Transition `#[async]` functions
+
+<dl><dt>from</dt> <dd>
+
+being written with a `Result` return type that gets rewritten inside the macro
+to `impl Future`
+
+</dd><dt>to</dt><dd>
+
+being written with an `impl Future` or similar return type directly
+
+</dd></dl>
+
+Also support return types of `impl Stream`, `Box<Future>`, `impl StableFuture`
+etc. (potentially any `CoerceUnsized` smart pointer if possible?).
 
 # Motivation
 [motivation]: #motivation
