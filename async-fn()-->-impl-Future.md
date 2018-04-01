@@ -125,6 +125,9 @@ fn fetch_rust_lang(client: hyper::Client) -> impl Future<Item=String, Error=io::
     let responseTask = client.get("https://www.rust-lang.org");
 
     // You can do work here that doesn't rely on the response.
+    //
+    // Wether or not this will actually run in parallel depends on whether
+    // `hyper::Client::get` spawned its work off onto a thread pool internally.
     do_something_else();
 
     // The `await!` macro suspends `fetch_rust_lang`
